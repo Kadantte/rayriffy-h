@@ -12,7 +12,7 @@ import { IProps } from '../@types/IProps'
 const TagViewingComponent: React.FC<IProps> = props => {
   const { raw, page, tag, prefix, subtitle } = props.pageContext
 
-  const [, setSubtitle] = useContext(Subtitle)
+  const { 1: setSubtitle } = useContext(Subtitle)
 
   useEffect(() => {
     setSubtitle(`${subtitle}`)
@@ -30,13 +30,11 @@ const TagViewingComponent: React.FC<IProps> = props => {
         </Box>
       </Flex>
       <Flex justifyContent='center'>
-        <Box width={22 / 24}>
-          <Flex flexWrap='wrap' alignItems='center'>
-            {raw.map(hentai => (
-              <Poster key={`poster-${hentai.data.id}`} raw={hentai.data.raw} />
-            ))}
-          </Flex>
-        </Box>
+        <Flex width={22 / 24} flexWrap='wrap' alignItems='center'>
+          {raw.map(hentai => (
+            <Poster key={`poster-${hentai.data.id}`} raw={hentai.data.raw} />
+          ))}
+        </Flex>
       </Flex>
       <Flex justifyContent='center'>
         <Box width={18 / 24} py={3}>

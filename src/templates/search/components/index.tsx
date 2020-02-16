@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import chunk from 'lodash.chunk'
-import get from 'lodash.get'
-import isEmpty from 'lodash.isempty'
+import { chunk, get, isEmpty } from 'lodash-es'
 
 import { Box, Flex, IconButton, Input, useColorMode } from '@chakra-ui/core'
 
@@ -22,13 +20,13 @@ const SearchComponent: React.FC<IProps> = props => {
 
   const { colorMode } = useColorMode()
 
-  const [, setSubtitle] = useContext(Subtitle)
+  const { 1: setSubtitle } = useContext(Subtitle)
 
-  const [query, setQuery] = useState<string>('')
-  const [res, setRes] = useState<IHentai[]>([])
+  const { 0: query, 1: setQuery } = useState<string>('')
+  const { 0: res, 1: setRes } = useState<IHentai[]>([])
 
-  const [page, setPage] = useState<number>(1)
-  const [renderedRaw, setRenderedRaw] = useState<IHentai[]>([])
+  const { 0: page, 1: setPage } = useState<number>(1)
+  const { 0: renderedRaw, 1: setRenderedRaw } = useState<IHentai[]>([])
 
   const { searchHentai } =
     typeof window === 'object'
@@ -67,31 +65,31 @@ const SearchComponent: React.FC<IProps> = props => {
   return (
     <React.Fragment>
       <Flex justifyContent='center' pt={3}>
-        <Box width={[20 / 24, 16 / 24, 12 / 24, 8 / 24]}>
-          <Flex justifyContent='center'>
-            <Input
-              placeholder='Search'
-              value={query}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setQuery(e.target.value)
-              }
-              color={colorMode === 'dark' ? 'white' : undefined}
-              _placeholder={{
-                color: colorMode === 'dark' ? 'white' : 'gray.500',
-              }}
-              onKeyDown={(e: { key: string }) =>
-                e.key === 'Enter' ? searchButtonHandler() : null
-              }
-            />
-            <IconButton
-              aria-label='Search'
-              icon='search'
-              variantColor='blue'
-              onClick={() => searchButtonHandler()}
-              ml={4}
-            />
-          </Flex>
-        </Box>
+        <Flex
+          width={[20 / 24, 16 / 24, 12 / 24, 8 / 24]}
+          justifyContent='center'>
+          <Input
+            placeholder='Search'
+            value={query}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setQuery(e.target.value)
+            }
+            color={colorMode === 'dark' ? 'white' : undefined}
+            _placeholder={{
+              color: colorMode === 'dark' ? 'white' : 'gray.500',
+            }}
+            onKeyDown={(e: { key: string }) =>
+              e.key === 'Enter' ? searchButtonHandler() : null
+            }
+          />
+          <Box mx={2} />
+          <IconButton
+            aria-label='Search'
+            icon='search'
+            variantColor='blue'
+            onClick={() => searchButtonHandler()}
+          />
+        </Flex>
       </Flex>
       <Flex justifyContent='center'>
         <Box width={22 / 24}>
@@ -111,13 +109,11 @@ const SearchComponent: React.FC<IProps> = props => {
                 </Box>
               </Flex>
               <Flex justifyContent='center'>
-                <Box width={22 / 24}>
-                  <Flex flexWrap='wrap' alignItems='center'>
-                    {renderedRaw.map(hentai => (
-                      <Poster key={`poster-${hentai.id}`} raw={hentai} />
-                    ))}
-                  </Flex>
-                </Box>
+                <Flex width={22 / 24} flexWrap='wrap' alignItems='center'>
+                  {renderedRaw.map(hentai => (
+                    <Poster key={`poster-${hentai.id}`} raw={hentai} />
+                  ))}
+                </Flex>
               </Flex>
               <Flex justifyContent='center'>
                 <Box width={18 / 24} py={6}>

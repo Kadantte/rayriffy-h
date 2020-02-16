@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import { Box, Flex, useColorMode } from '@chakra-ui/core'
+import { Box, Flex, theme, useColorMode } from '@chakra-ui/core'
 import styled from '@emotion/styled'
-import { theme } from '../../store/theme'
 
 import Link from '../../core/components/transparentLink'
 
@@ -40,7 +39,9 @@ const TransparentLink = styled(Link)<IPage>`
 const PaginationComponent: React.FC<IProps> = props => {
   const { max, current, prefix } = props
 
-  const [color, setColor] = useState<'dark' | 'light' | undefined>(undefined)
+  const { 0: color, 1: setColor } = useState<'dark' | 'light' | undefined>(
+    undefined
+  )
 
   const { colorMode } = useColorMode()
 

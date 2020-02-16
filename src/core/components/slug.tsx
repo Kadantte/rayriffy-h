@@ -9,25 +9,23 @@ import { ISlugProps } from '../@types/ISlugProps'
 const SlugComponent: React.FC<ISlugProps> = props => {
   const { color, link, title } = props
 
+  const badge: React.ReactNode = (
+    <Badge fontSize={11} variant='outline' variantColor={color}>
+      {title}
+    </Badge>
+  )
+
   return (
-    <React.Fragment>
+    <Box px={1}>
       {link ? (
-        <Box px={1}>
-          <TransparentLink to={link} aria-label={title}>
-            <Badge fontSize={11} variant='outline' variantColor={color}>
-              {title}
-            </Badge>
-          </TransparentLink>
-        </Box>
+        <TransparentLink to={link} aria-label={title}>
+          {badge}
+        </TransparentLink>
       ) : (
-        <Box px={1}>
-          <Badge fontSize={11} variant='outline' variantColor={color}>
-            {title}
-          </Badge>
-        </Box>
+        badge
       )}
-    </React.Fragment>
+    </Box>
   )
 }
 
-export default SlugComponent
+export default React.memo(SlugComponent)

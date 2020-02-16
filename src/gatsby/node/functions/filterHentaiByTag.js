@@ -1,5 +1,4 @@
-const isEmpty = require('lodash.isempty')
-const filter = require('lodash.filter')
+const { filter, isEmpty } = require('lodash')
 
 /**
  * Filter hentai by tag ID
@@ -10,7 +9,9 @@ exports.filterHentaiByTag = (healthyResults, tag) => {
 
   healthyResults.map(node => {
     if (node) {
-      if (!isEmpty(filter(node.data.raw.tags, o => o.id === tag.id))) { qualifiedResults.push(node) }
+      if (!isEmpty(filter(node.data.raw.tags, o => o.id === tag.id))) {
+        qualifiedResults.push(node)
+      }
     }
   })
 

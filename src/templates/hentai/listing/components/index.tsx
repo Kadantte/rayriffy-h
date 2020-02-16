@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 
 import { Box, Flex } from '@chakra-ui/core'
 
@@ -12,33 +12,38 @@ import { IProps } from '../@types/IProps'
 const HentaiListingComponent: React.FC<IProps> = props => {
   const { raw, page } = props.pageContext
 
-  const [, setSubtitle] = useContext(Subtitle)
+  const { 1: setSubtitle } = useContext(Subtitle)
 
   useEffect(() => {
     setSubtitle(`listing`)
   }, [])
 
-  return (
-    <React.Fragment>
+  const pagination = useMemo<React.ReactNode>(
+    () => (
       <Flex justifyContent='center' pt={2}>
         <Box width={18 / 24} pt={3} pb={6}>
           <Pagination current={page.current} max={page.max} prefix='/' />
         </Box>
       </Flex>
+    ),
+    []
+  )
+
+  return (
+    <React.Fragment>
+      {pagination}
       <Flex justifyContent='center'>
-        <Box width={22 / 24}>
-          <Flex flexWrap='wrap' alignItems='center'>
-            {raw.map(hentai => (
-              <Poster key={`poster-${hentai.data.id}`} raw={hentai.data.raw} />
-            ))}
-          </Flex>
-        </Box>
+        <Flex
+          width={22 / 24}
+          flexWrap='wrap'
+          justifyContent='center'
+          alignItems='center'>
+          {raw.map(hentai => (
+            <Poster key={`poster-${hentai.data.id}`} raw={hentai.data.raw} />
+          ))}
+        </Flex>
       </Flex>
-      <Flex justifyContent='center'>
-        <Box width={18 / 24} pt={8} pb={12}>
-          <Pagination current={page.current} max={page.max} prefix={`/`} />
-        </Box>
-      </Flex>
+      {pagination}
     </React.Fragment>
   )
 }

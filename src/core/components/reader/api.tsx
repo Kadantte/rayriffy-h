@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import axios from 'axios'
 import { FaCopy, FaDownload } from 'react-icons/fa'
 
 import {
@@ -54,15 +53,15 @@ const StyledLink = styled(Link)`
 const ReaderAPIComponent: React.FC<IReaderAPIProps> = props => {
   const { id } = props
 
-  const [image, setImage] = useState<string>('')
-  const [error, setError] = useState<boolean>(false)
+  const { 0: image, 1: setImage } = useState<string>('')
+  const { 0: error, 1: setError } = useState<boolean>(false)
   const { onCopy, hasCopied } = useClipboard(id)
 
   useEffect(() => {
-    axios
-      .get(`https://h.api.rayriffy.com/v1/encode/${id}`)
+    fetch(`https://h.api.rayriffy.com/v1/encode/${id}`)
+      .then(raw => raw.json())
       .then(res => {
-        setImage(res.data.response.data)
+        setImage(res.response.data)
       })
       .catch(() => {
         setError(true)

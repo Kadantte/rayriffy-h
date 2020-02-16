@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import chunk from 'lodash.chunk'
-import get from 'lodash.get'
-import isEmpty from 'lodash.isempty'
+import { chunk, get, isEmpty } from 'lodash-es'
 
 import { Box, Flex, Text } from '@chakra-ui/core'
 
@@ -19,13 +17,17 @@ import { IProps } from '../@types/IProps'
 const CollectionComponent: React.FC<IProps> = props => {
   const { skip } = props.pageContext
 
-  const [, setSubtitle] = useContext(Subtitle)
-  const [collection, setCollection] = useContext(Collection)
+  const { 1: setSubtitle } = useContext(Subtitle)
+  const { 0: collection, 1: setCollection } = useContext(Collection)
 
-  const [fetchedCollection, setFetchedCollection] = useState<IFavorite[]>([])
+  const { 0: fetchedCollection, 1: setFetchedCollection } = useState<
+    IFavorite[]
+  >([])
 
-  const [page, setPage] = useState<number>(1)
-  const [renderedCollection, setRenderedCollection] = useState<IFavorite[]>([])
+  const { 0: page, 1: setPage } = useState<number>(1)
+  const { 0: renderedCollection, 1: setRenderedCollection } = useState<
+    IFavorite[]
+  >([])
 
   const renderPage = (collection: IFavorite[], page: number) => {
     setPage(page)
@@ -33,8 +35,8 @@ const CollectionComponent: React.FC<IProps> = props => {
   }
 
   useEffect(() => {
-    setFetchedCollection(JSON.parse(collection).reverse())
-    renderPage(JSON.parse(collection).reverse(), 1)
+    setFetchedCollection(collection.data.reverse())
+    renderPage(collection.data.reverse(), 1)
   }, [collection])
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const CollectionComponent: React.FC<IProps> = props => {
   return (
     <Flex justifyContent='center'>
       <Box width={22 / 24}>
-        <Actions {...{ setCollection, fetchedCollection }} />
+        <Actions {...{ collection, setCollection }} />
         {isEmpty(fetchedCollection) ? (
           <React.Fragment>
             <Heading size='lg' textAlign='center' pt={6}>
@@ -66,17 +68,15 @@ const CollectionComponent: React.FC<IProps> = props => {
               </Box>
             </Flex>
             <Flex justifyContent='center'>
-              <Box width={22 / 24}>
-                <Flex flexWrap='wrap' alignItems='center'>
-                  {renderedCollection.map(hentai => (
-                    <Poster
-                      key={`poster-${hentai.id}`}
-                      raw={hentai.data}
-                      internal={hentai.internal}
-                    />
-                  ))}
-                </Flex>
-              </Box>
+              <Flex width={22 / 24} flexWrap='wrap' alignItems='center'>
+                {renderedCollection.map(hentai => (
+                  <Poster
+                    key={`poster-${hentai.id}`}
+                    raw={hentai.data}
+                    internal={hentai.internal}
+                  />
+                ))}
+              </Flex>
             </Flex>
             <Flex justifyContent='center'>
               <Box width={18 / 24} py={6}>

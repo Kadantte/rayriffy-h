@@ -14,18 +14,18 @@ import {
   IconButton,
   Switch,
   Text,
+  theme,
   useColorMode,
   useDisclosure,
 } from '@chakra-ui/core'
 import styled from '@emotion/styled'
-import { theme } from '../../store/theme'
 
 import { tags as tagStack } from '../../contents/database/tags'
 
 import Heading, { headingFontColor } from '../../core/components/heading'
 import TransparentLink from '../../core/components/transparentLink'
 
-import { SafeMode } from '../../store'
+import { Settings } from '../../store'
 
 const CapitalizedText = styled(Text)`
   text-transform: capitalize;
@@ -35,16 +35,16 @@ const DrawerComponent: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { colorMode, toggleColorMode } = useColorMode()
-  const [safeMode, setSafeMode] = useContext(SafeMode)
+  const { 0: settings, 1: setSettings } = useContext(Settings)
 
-  const [color, setColor] = useState<string | undefined>(undefined)
+  const { 0: color, 1: setColor } = useState<string | undefined>(undefined)
 
   const btnRef = useRef(null)
 
   const themeColor: any = theme.colors
 
-  const toggleSafeMode = () => {
-    setSafeMode(prev => !prev)
+  const toggleSetting = (key: 'safemode' | 'lefthand') => {
+    setSettings(prev => ({ ...prev, [key]: !prev[key] }))
   }
 
   const menuStacks = [
@@ -92,7 +92,7 @@ const DrawerComponent: React.FC = () => {
       />
       <Drawer
         isOpen={isOpen}
-        placement='right'
+        placement={settings.lefthand ? 'left' : 'right'}
         onClose={onClose}
         isFullHeight={true}
         finalFocusRef={btnRef}>
@@ -105,7 +105,7 @@ const DrawerComponent: React.FC = () => {
               <Heading size='2xl'>Riffy H</Heading>
               <Text color='gray.500'>The missng piece of NHentai</Text>
               <Text color='gray.400' fontSize='xs'>
-                Version 3.4.3
+                Version 3.6.0
               </Text>
             </Box>
             <Divider mt={4} mb={2} />
@@ -166,8 +166,8 @@ const DrawerComponent: React.FC = () => {
                   <Flex py={1}>
                     <Switch
                       id='safemode'
-                      isChecked={safeMode === undefined ? true : safeMode}
-                      onChange={toggleSafeMode}>
+                      isChecked={settings.safemode}
+                      onChange={() => toggleSetting('safemode')}>
                       <React.Fragment />
                     </Switch>
                     <Text px={2} fontSize='sm' color='gray.500'>
@@ -185,6 +185,17 @@ const DrawerComponent: React.FC = () => {
                     </Switch>
                     <Text px={2} fontSize='sm' color='gray.500'>
                       Dark mode
+                    </Text>
+                  </Flex>
+                  <Flex py={1}>
+                    <Switch
+                      id='lefthand'
+                      isChecked={settings.lefthand}
+                      onChange={() => toggleSetting('lefthand')}>
+                      <React.Fragment />
+                    </Switch>
+                    <Text px={2} fontSize='sm' color='gray.500'>
+                      Left-handed mode
                     </Text>
                   </Flex>
                 </Box>

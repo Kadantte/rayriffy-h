@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
-import axios from 'axios'
-import isEmpty from 'lodash.isempty'
+import { isEmpty } from 'lodash-es'
 
 import {
   Box,
@@ -28,11 +27,11 @@ import {
 
 import Heading from '../../../core/components/heading'
 
-import { IFavorite } from '../../../core/@types/IFavorite'
+import { ICollection } from '../../../core/@types/ICollection'
 import { IActionsProps } from '../@types/IActionsProps'
 
 const ActionsComponent: React.FC<IActionsProps> = props => {
-  const { fetchedCollection, setCollection } = props
+  const { collection, setCollection } = props
 
   const toast = useToast()
   const { colorMode } = useColorMode()
@@ -42,7 +41,9 @@ const ActionsComponent: React.FC<IActionsProps> = props => {
     onOpen: exportOnOpen,
     onClose: exportOnClose,
   } = useDisclosure()
-  const [exportStat, setExportStat] = useState<'wait' | 'load' | string>('wait')
+  const { 0: exportStat, 1: setExportStat } = useState<
+    'wait' | 'load' | string
+  >('wait')
   const { onCopy, hasCopied } = useClipboard(exportStat)
 
   const {
@@ -50,19 +51,24 @@ const ActionsComponent: React.FC<IActionsProps> = props => {
     onOpen: importOnOpen,
     onClose: importOnClose,
   } = useDisclosure()
-  const [importLoad, setImportLoad] = useState<boolean>(false)
-  const [input, setInput] = useState<string>('')
+  const { 0: importLoad, 1: setImportLoad } = useState<boolean>(false)
+  const { 0: input, 1: setInput } = useState<string>('')
 
   const exportHandler = async () => {
     try {
       setExportStat('load')
 
-      const res = await axios.post<{ key: string }>(
+      const res: { key: string } = await fetch(
         `https://bytebin.lucko.me/post`,
-        fetchedCollection.reverse()
-      )
+        {
+          credentials: 'same-origin',
+          method: 'POST',
+          body: JSON.stringify(collection),
+          headers: { 'Content-Type': 'application/json' },
+        }
+      ).then(raw => raw.json())
 
-      setExportStat(res.data.key)
+      setExportStat(res.key)
 
       toast({
         title: 'Data exported.',
@@ -86,51 +92,21 @@ const ActionsComponent: React.FC<IActionsProps> = props => {
     try {
       setImportLoad(true)
 
-      const res = await axios.get<IFavorite[]>(`https://bytebin.lucko.me/${id}`)
+      const res: ICollection = await fetch(
+        `https://bytebin.lucko.me/${id}`
+      ).then(raw => raw.json())
 
-      if (typeof res.data === 'object' && res.data.length !== undefined) {
-        const transformedArray = res.data.map(favorite => {
-          try {
-            if (
-              typeof favorite.internal === 'boolean' &&
-              (typeof favorite.id === 'number' ||
-                typeof favorite.id === 'string') &&
-              typeof favorite.data === 'object'
-            ) {
-              return {
-                ...favorite,
-                data: {
-                  id: favorite.data.id,
-                  media_id: favorite.data.media_id,
-                  title: favorite.data.title,
-                  images: {
-                    cover: favorite.data.images.cover,
-                    pages: [],
-                  },
-                  tags: favorite.data.tags.map(o => ({
-                    id: o.id,
-                    name: o.name,
-                    type: o.type,
-                  })),
-                },
-              }
-            } else {
-              return 'fa'
-            }
-          } catch (e) {
-            return 'fa'
-          }
-        })
-
-        const importedArray = transformedArray.filter(
-          o => o !== 'fa'
-        ) as IFavorite[]
-
-        setCollection(JSON.stringify(importedArray))
+      if (
+        typeof res === 'object' &&
+        typeof res.version === 'number' &&
+        typeof res.data === 'object' &&
+        res.data.length !== undefined
+      ) {
+        setCollection(res)
 
         toast({
           title: 'Data imported.',
-          description: `Imported ${importedArray.length} items to collection.`,
+          description: `Imported ${res.data.length} items to collection.`,
           status: 'success',
           duration: 4000,
           isClosable: true,
@@ -167,28 +143,26 @@ const ActionsComponent: React.FC<IActionsProps> = props => {
   return (
     <React.Fragment>
       <Flex justifyContent='center' pt={2}>
-        <Box width={22 / 24}>
-          <Flex alignItems='center'>
-            <Menu>
-              <MenuButton as={Button}>
-                Actions <Icon pl={2} name='chevron-down' />
-              </MenuButton>
-              <MenuList>
-                <MenuItem
-                  onClick={exportOnOpen}
-                  isDisabled={isEmpty(fetchedCollection)}>
-                  Export
-                </MenuItem>
-                <MenuItem onClick={importOnOpen}>Import</MenuItem>
-                <MenuDivider />
-                <MenuItem>Reset</MenuItem>
-              </MenuList>
-            </Menu>
-            <Heading pl={4} size='sm'>
-              {fetchedCollection.length} Items
-            </Heading>
-          </Flex>
-        </Box>
+        <Flex width={22 / 24} alignItems='center'>
+          <Menu>
+            <MenuButton as={Button}>
+              Actions <Icon pl={2} name='chevron-down' />
+            </MenuButton>
+            <MenuList>
+              <MenuItem
+                onClick={exportOnOpen}
+                isDisabled={isEmpty(collection.data)}>
+                Export
+              </MenuItem>
+              <MenuItem onClick={importOnOpen}>Import</MenuItem>
+              <MenuDivider />
+              <MenuItem>Reset</MenuItem>
+            </MenuList>
+          </Menu>
+          <Heading pl={4} size='sm'>
+            {collection.data.length} Items
+          </Heading>
+        </Flex>
       </Flex>
 
       <Modal isOpen={exportIsOpen} onClose={exportOnClose}>
