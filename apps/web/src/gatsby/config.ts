@@ -9,21 +9,8 @@ const config: GatsbyConfig = {
   },
   pathPrefix: '/',
   plugins: [
-    `gatsby-plugin-preact`,
-    {
-      resolve: `gatsby-plugin-compile-es6-packages`,
-      options: {
-        modules: [`gatsby-plugin-chakra-ui`],
-      },
-    },
-    {
-      resolve: `gatsby-plugin-emotion`,
-      options: {
-        sourceMap: true,
-        cssPropOptimization: true,
-      },
-    },
-    `gatsby-plugin-chakra-ui`,
+    `gatsby-plugin-postcss`,
+    // `gatsby-plugin-preact`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -42,7 +29,7 @@ const config: GatsbyConfig = {
     },
     {
       resolve: `gatsby-plugin-create-client-paths`,
-      options: { prefixes: [`/g/*`] },
+      options: { prefixes: [`/g/*`, `/p/*`] },
     },
     {
       resolve: `gatsby-plugin-manifest`,
@@ -50,10 +37,14 @@ const config: GatsbyConfig = {
         name: `Riffy H`,
         short_name: `Riffy H`,
         start_url: `/`,
-        background_color: `#f5f5f5`,
+        lang: `en`,
+        background_color: `#2d3748`,
         theme_color: `#1a202c`,
-        display: `minimal-ui`,
-        icon: `static/img/LOGO-C-min.png`,
+        display: 'standalone',
+        icon: `${__dirname}/../../static/img/favicon.png`,
+        icon_options: {
+          purpose: `any maskable`,
+        },
       },
     },
     `gatsby-plugin-react-helmet`,

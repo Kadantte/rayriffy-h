@@ -1,7 +1,7 @@
-import { Cache, Reporter } from 'gatsby'
+import { GatsbyCache, Reporter } from 'gatsby'
 import { getHentai, rawHentaiToHentai } from '@rayriffy-h/helper'
 
-import { FetchedRaw } from '../../../core/@types'
+import { FetchedRaw } from '../../../core/@types/FetchedRaw'
 
 /**
  * Featch raw data from cache or API
@@ -11,7 +11,7 @@ import { FetchedRaw } from '../../../core/@types'
 export const getRawData = async (
   id: number,
   exclude: number[],
-  { reporter, cache }: { cache: Cache['cache']; reporter: Reporter }
+  { reporter, cache }: { cache: GatsbyCache; reporter: Reporter }
 ): Promise<FetchedRaw> => {
   try {
     // Read file from cache
