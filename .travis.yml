@@ -1,0 +1,71 @@
+os: linux
+dist: bionic
+
+language: node_js
+
+node_js: lts/*
+
+cache:
+  # Dependencies
+  yarn: true
+  pip: true
+  # Cypress binary
+  directories:
+    - ~/.cache
+
+install:
+  - yarn
+
+script:
+  - yarn nx test helper
+  - yarn nx test fetch
+
+jobs:
+  include:
+    - name: apps/web
+      before_install:
+        - pyenv install --list
+        - pyenv install 3.6.3
+        - pyenv local 3.6.3
+        - python --version
+      script:
+        - yarn nx test web
+        - yarn nx e2e web-e2e
+      before_deploy:
+        - pip install git+https://github.com/naftulikay/travis-pls
+        - yarn global add netlify-cli
+        - yarn nx:highmem build web --skip-nx-cache
+      deploy:
+        provider: script
+        script: travis-pls netlify deploy --dir=apps/web/public --message "Automatic deployment from Travis CI" --prod --site $NETLIFY_WEB_ID
+        edge: true
+        on:
+          repo: rayriffy/rayriffy-h
+          branch: master
+    - name: apps/api
+      script:
+        - yarn nx test api
+      before_deploy:
+        - yarn global add vercel
+        - yarn nx build api --skip-nx-cache
+      deploy:
+        provider: script
+        script: vercel -t $VERCEL_AUTH_TOKEN --prod
+        edge: true
+        on:
+          repo: rayriffy/rayriffy-h
+          branch: master
+    - name: apps/poster
+      script:
+        - yarn nx test poster
+        - yarn nx e2e poster-e2e
+      before_deploy:
+        - yarn global add netlify-cli
+        - yarn nx export poster --skip-nx-cache
+      deploy:
+        provider: script
+        script: netlify deploy --dir=dist/apps/poster/exported --message "Automatic deployment from Travis CI" --prod --site $NETLIFY_POSTER_ID
+        edge: true
+        on:
+          repo: rayriffy/rayriffy-h
+          branch: master

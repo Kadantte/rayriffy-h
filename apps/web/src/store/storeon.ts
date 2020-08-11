@@ -19,16 +19,34 @@ import { history } from './states/history'
 import { HistoryStore } from './@types/HistoryStore'
 import { HistoryEvent } from './@types/HistoryEvent'
 
-export type Store = CollectionStore & SettingsStore & SubtitleStore & HistoryStore
-export type Event = CollectionEvent & SettingsEvent & SubtitleEvent & HistoryEvent
+import { search } from './states/search'
+import { SearchStore } from './@types/SearchStore'
+import { SearchEvent } from './@types/SearchEvent'
+
+export type Store = CollectionStore &
+  SettingsStore &
+  SubtitleStore &
+  HistoryStore &
+  SearchStore
+export type Event = CollectionEvent &
+  SettingsEvent &
+  SubtitleEvent &
+  HistoryEvent &
+  SearchEvent
 
 export const store = createStoreon<Store, Event>([
   settings,
   collection,
   subtitle,
   history,
-  ...typeof window !== 'undefined' ? [
-    persistState(['settings', 'collection', 'history']),
-    crossTab({ filter: (event, data) => event !== 'subtitle/setSubtitle' }),
-  ] : []
+  search,
+  ...(typeof window !== 'undefined'
+    ? [
+        persistState(['settings', 'collection', 'history']),
+        persistState(['search'], {
+          storage: sessionStorage,
+        }),
+        crossTab({ filter: (event, data) => event !== 'subtitle/setSubtitle' || event.startsWith('search/') }),
+      ]
+    : []),
 ])
