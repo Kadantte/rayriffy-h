@@ -8,7 +8,8 @@
     },
     "tslint.json": "*",
     "nx.json": "*",
-    "tsconfig.base.json": "*"
+    "tsconfig.base.json": "*",
+    ".eslintrc.json": "*"
   },
   "tasksRunnerOptions": {
     "default": {
@@ -44,6 +45,13 @@
     "web-e2e": {
       "tags": [],
       "implicitDependencies": ["web"]
+    },
+    "web-next": {
+      "tags": []
+    },
+    "web-next-e2e": {
+      "tags": [],
+      "implicitDependencies": ["web-next"]
     }
   },
   "affected": {
